@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { lookupAppleByUpc, lookupDeezerByUpc, resolveLinks } from "@/lib/links";
+import { lookupAppleByUpc, lookupDeezerByUpc, lookupOdesli, lookupSpotifyByUpc, resolveLinks, type LinkCredentials } from "@/lib/links";
+
+const KEYS: LinkCredentials = { spotifyClientId: "id", spotifyClientSecret: "secret", odesliApiKey: "k" };
+const NO_KEYS: LinkCredentials = {};
 
 type Routes = Record<string, unknown>;
 
@@ -38,6 +41,24 @@ describe("UPC lookups", () => {
     ).toBeNull();
   });
 
+  it("Spotify needs credentials, then searches upc:<UPC> with a bearer token", async () => {
+    const f = fakeFetch({
+      "accounts.spotify.com": { access_token: "tok" },
+      "api.spotify.com": { albums: { items: [{ external_urls: { spotify: SPOTIFY } }] } },
+    });
+    expect(await lookupSpotifyByUpc(UPC, NO_KEYS, f.fetcher)).toBeNull();
+    expect(f.calls).toHaveLength(0);
+    expect(await lookupSpotifyByUpc(UPC, KEYS, f.fetcher)).toBe(SPOTIFY);
+    expect(f.calls[1]).toContain(encodeURIComponent(`upc:${UPC}`));
+  });
+
+  it("Odesli is skipped without an API key (its keyless API returns 401)", async () => {
+    const f = fakeFetch({ "api.song.link": { linksByPlatform: { tidal: { url: "https://tidal.com/a" } } } });
+    expect(await lookupOdesli(SPOTIFY, undefined, f.fetcher)).toEqual({});
+    expect(f.calls).toHaveLength(0);
+    expect(await lookupOdesli(SPOTIFY, "k", f.fetcher)).toEqual({ tidal: "https://tidal.com/a" });
+  });
+
   it("strips iTunes' affiliate uo= param", async () => {
     const f = fakeFetch({
       "itunes.apple.com": { results: [{ collectionViewUrl: `${APPLE}?uo=4` }] },
@@ -52,7 +73,7 @@ describe("resolveLinks", () => {
       "api.deezer.com": { error: {} },
       "itunes.apple.com": { results: [] },
     });
-    const r = await resolveLinks({ upc: UPC }, fetcher);
+    const r = await resolveLinks({ upc: UPC }, fetcher, NO_KEYS);
     expect(r.isLive).toBe(false);
     expect(r.links.map((l) => l.id)).toEqual([
       "spotify",
@@ -75,7 +96,7 @@ describe("resolveLinks", () => {
         },
       },
     });
-    const r = await resolveLinks({ upc: UPC }, fetcher);
+    const r = await resolveLinks({ upc: UPC }, fetcher, KEYS);
     expect(r.isLive).toBe(true);
     const byId = Object.fromEntries(r.links.map((l) => [l.id, l.url]));
     expect(byId).toMatchObject({
@@ -103,6 +124,7 @@ describe("resolveLinks", () => {
     const r = await resolveLinks(
       { linkOverrides: { spotify: SPOTIFY, deezer: manualDeezer } },
       fetcher,
+      KEYS,
     );
     const byId = Object.fromEntries(r.links.map((l) => [l.id, l.url]));
     expect(byId).toMatchObject({
@@ -112,12 +134,23 @@ describe("resolveLinks", () => {
     });
   });
 
+  it("without any keys: Deezer + Apple still go live from the UPC alone", async () => {
+    const { fetcher, calls } = fakeFetch({
+      "api.deezer.com": { link: DEEZER },
+      "itunes.apple.com": { results: [{ collectionViewUrl: APPLE }] },
+    });
+    const r = await resolveLinks({ upc: UPC }, fetcher, NO_KEYS);
+    const byId = Object.fromEntries(r.links.map((l) => [l.id, l.url]));
+    expect(byId).toEqual({ spotify: null, appleMusic: APPLE, youtubeMusic: null, deezer: DEEZER });
+    expect(calls.some((c) => c.includes("spotify") || c.includes("song.link"))).toBe(false);
+  });
+
   it("network failures degrade to no links instead of throwing", async () => {
     const { fetcher } = fakeFetch({
       "api.deezer.com": "throw",
       "itunes.apple.com": "throw",
     });
-    const r = await resolveLinks({ upc: UPC }, fetcher);
+    const r = await resolveLinks({ upc: UPC }, fetcher, NO_KEYS);
     expect(r.isLive).toBe(false);
   });
 
@@ -126,7 +159,7 @@ describe("resolveLinks", () => {
       "api.deezer.com": { link: DEEZER },
       "api.song.link": "throw",
     });
-    const r = await resolveLinks({ upc: UPC }, fetcher);
+    const r = await resolveLinks({ upc: UPC }, fetcher, NO_KEYS);
     expect(r.links.find((l) => l.id === "deezer")?.url).toBe(DEEZER);
     expect(r.isLive).toBe(true);
   });

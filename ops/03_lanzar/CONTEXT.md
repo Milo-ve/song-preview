@@ -16,7 +16,8 @@ No cargues: `site/` salvo que haya que arreglar la detección.
 3. Si no sale nada:
    - Revisa que el UPC sea el que dio la distribuidora (a veces confunden UPC con ISRC).
    - Las plataformas tardan de horas a días en indexar. Vuelve a intentarlo mañana.
-   - Si ya ves la canción en Spotify o Apple Music, pega esa URL como link manual en `/admin`. Con eso Odesli completa las demás.
+   - Si ya ves la canción en Spotify o Apple Music, pega esa URL como link manual en `/admin`.
+   - YouTube Music (y Tidal/Amazon si no hay `ODESLI_API_KEY`) casi siempre va como link manual: búscalo y pégalo.
 4. Si un link automático está mal, sobrescríbelo con un link manual.
 
 ## Outputs

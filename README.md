@@ -4,7 +4,7 @@ Páginas de preview para canciones antes de su lanzamiento. Sirve para cualquier
 
 1. El artista entra a `/subir`, sube la portada y el audio, y elige el pedazo de 15–45 s que quiere mostrar. El audio se corta **en su navegador**, así que la canción completa nunca se sube.
 2. El operador revisa en `/admin` y aprueba. La página queda pública en `/<artista>/<cancion>`, en modo "Próximamente".
-3. Cuando la distribuidora activa el lanzamiento, la página encuentra el release por su **UPC** (Deezer + iTunes, sin API keys) y aparecen solos los botones de Spotify, Apple Music, YouTube Music, Deezer, Tidal, etc. (vía [Odesli](https://odesli.co)).
+3. Cuando la distribuidora activa el lanzamiento, la página encuentra el release por su **UPC** y aparecen solos los botones: Deezer y Apple Music sin ninguna llave, y Spotify con una llave gratis de developer.spotify.com. Las demás plataformas salen con una llave de [Odesli](https://odesli.co) o como links manuales en `/admin`. Detalle en [`CONTEXT.md`](CONTEXT.md).
 
 ## Para operar
 

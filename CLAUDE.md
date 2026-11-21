@@ -1,6 +1,6 @@
 # song-preview
 
-Páginas de preview para canciones de cualquier artista. El artista sube su canción y su portada en `/subir`, el operador aprueba en `/admin` y la página queda en `dominio/<artista>/<cancion>`. Cuando la distribuidora activa el lanzamiento, los links a plataformas aparecen solos (UPC → Deezer/iTunes → Odesli).
+Páginas de preview para canciones de cualquier artista. El artista sube su canción y su portada en `/subir`, el operador aprueba en `/admin` y la página queda en `dominio/<artista>/<cancion>`. Cuando la distribuidora activa el lanzamiento, los links a plataformas aparecen solos (por UPC: Deezer y Apple sin llave, Spotify con llave gratis; ver `CONTEXT.md`).
 
 Construido con ICM: las carpetas llevan el orden, cada carpeta explica su trabajo en su `CONTEXT.md` y el estado se puede leer en archivos.
 

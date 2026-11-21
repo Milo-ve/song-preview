@@ -12,7 +12,7 @@ Next.js 16 + Vercel Blob. Lee `AGENTS.md` antes de tocar código y `../CLAUDE.md
 | Archivo | Papel |
 |---|---|
 | `lib/release.ts` | el modelo y los schemas: fuente única de los campos |
-| `lib/links.ts` | UPC → Deezer/iTunes → Odesli: cómo aparecen los links solos |
+| `lib/links.ts` | cómo aparecen los links solos: UPC → Deezer/Apple (sin llave), Spotify y Odesli (con llave) |
 | `lib/store.ts` | lectura y escritura de releases en Blob |
 | `lib/audio/clip.ts`, `lib/image.ts` | procesamiento en el navegador |
 
