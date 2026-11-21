@@ -108,47 +108,71 @@ const hex = (r: number, g: number, b: number) =>
 const luminance = (r: number, g: number, b: number) =>
   (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
 
+function hue(r: number, g: number, b: number): number {
+  const max = Math.max(r, g, b);
+  const d = max - Math.min(r, g, b);
+  if (d === 0) return 0;
+  const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return (h * 60 + 360) % 360;
+}
+
+/** Mix toward white until the color is at least `minLum` bright (readable on the dark background). */
+function lift(r: number, g: number, b: number, minLum: number): [number, number, number] {
+  let t = 0;
+  let c: [number, number, number] = [r, g, b];
+  while (luminance(...c) < minLum && t < 1) {
+    t += 0.05;
+    c = [r + (255 - r) * t, g + (255 - g) * t, b + (255 - b) * t];
+  }
+  return c;
+}
+
 /**
- * Theme from the cover: background = darkened average color, accent = the most
- * saturated common color, foreground = near-white or near-black for contrast.
+ * Theme from the cover: background = darkened average color; accent = a saturated
+ * cover color whose hue stands out from the background, lifted for contrast;
+ * foreground = warm off-white.
  */
 export function extractTheme(img: ImageBitmap): Theme {
   try {
     const { ctx } = canvas(48, 48);
     ctx.drawImage(img, 0, 0, 48, 48);
-    const px = ctx.getImageData(0, 0, 48, 48).data;
-    let sr = 0,
-      sg = 0,
-      sb = 0,
-      n = 0;
-    let best = { score: -1, r: 230, g: 167, b: 215 };
+    return themeFromPixels(ctx.getImageData(0, 0, 48, 48).data);
+  } catch {
+    return DEFAULT_THEME;
+  }
+}
+
+/** Pure part of extractTheme: RGBA pixels → theme. */
+export function themeFromPixels(px: Uint8ClampedArray): Theme {
+  {
+    let sr = 0, sg = 0, sb = 0, n = 0;
     for (let i = 0; i < px.length; i += 4) {
-      const [r, g, b] = [px[i], px[i + 1], px[i + 2]];
-      sr += r;
-      sg += g;
-      sb += b;
+      sr += px[i];
+      sg += px[i + 1];
+      sb += px[i + 2];
       n++;
-      const max = Math.max(r, g, b),
-        min = Math.min(r, g, b);
-      const sat = max === 0 ? 0 : (max - min) / max;
-      const l = luminance(r, g, b);
-      const score = sat * (l > 0.25 && l < 0.9 ? 1 : 0.2);
-      if (score > best.score) best = { score, r, g, b };
     }
     let [br, bg, bb] = [sr / n, sg / n, sb / n];
+    const bgHue = hue(br, bg, bb);
+
+    let best = { score: -1, r: 0, g: 0, b: 0 };
+    for (let i = 0; i < px.length; i += 4) {
+      const [r, g, b] = [px[i], px[i + 1], px[i + 2]];
+      const max = Math.max(r, g, b);
+      const sat = max === 0 ? 0 : (max - Math.min(r, g, b)) / max;
+      const l = luminance(r, g, b);
+      const dist = Math.abs(((hue(r, g, b) - bgHue + 540) % 360) - 180) / 180; // 0 = same hue, 1 = opposite
+      const score = sat * (l > 0.2 && l < 0.92 ? 1 : 0.2) * (0.3 + dist);
+      if (score > best.score) best = { score, r, g, b };
+    }
+
     // Darken the background until light text is readable on it.
     while (luminance(br, bg, bb) > 0.22) {
       br *= 0.85;
       bg *= 0.85;
       bb *= 0.85;
     }
-    return {
-      bg: hex(br, bg, bb),
-      fg: "#f6f1ea",
-      accent:
-        best.score > 0.25 ? hex(best.r, best.g, best.b) : DEFAULT_THEME.accent,
-    };
-  } catch {
-    return DEFAULT_THEME;
+    const accent = best.score > 0.15 ? hex(...lift(best.r, best.g, best.b, 0.55)) : DEFAULT_THEME.accent;
+    return { bg: hex(br, bg, bb), fg: "#f6f1ea", accent };
   }
 }
