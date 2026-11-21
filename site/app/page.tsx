@@ -12,9 +12,7 @@ export default function Home() {
           La página de tu próximo lanzamiento
         </h1>
         <p className="text-sm opacity-75">
-          Comparte un adelanto de tu canción antes de que salga. El día del
-          lanzamiento, los botones de Spotify, Apple Music, YouTube Music y
-          Deezer aparecen solos.
+          Comparte un adelanto de tu canción antes de que salga. El día del lanzamiento aparecen los botones para escucharla en Spotify, Apple Music y más.
         </p>
         <Link
           href="/subir"
