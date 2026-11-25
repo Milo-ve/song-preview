@@ -38,6 +38,8 @@ type Done = { path: string; previewUrl: string };
 
 const input =
   "w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2.5 text-sm placeholder:text-white/40 focus:outline-none focus:border-[var(--accent)]";
+const fileInput =
+  "w-full text-sm text-white/60 cursor-pointer file:mr-4 file:cursor-pointer file:rounded-lg file:border file:border-white/30 file:bg-white/10 file:px-4 file:py-2.5 file:font-mono file:text-sm file:font-bold file:text-white hover:file:bg-white/20 hover:file:border-[var(--accent)] focus-visible:outline-none focus-visible:file:border-[var(--accent)]";
 const label =
   "flex flex-col gap-1.5 text-xs uppercase tracking-widest text-white/70";
 
@@ -192,6 +194,7 @@ export default function UploadForm() {
         distributor: get("distributor"),
         upc: get("upc"),
         isrc: get("isrc"),
+        presaveUrl: get("presaveUrl"),
         contactEmail: get("contactEmail"),
         clipUrl: clipBlob.url,
         coverUrl: coverBlob.url,
@@ -293,13 +296,24 @@ export default function UploadForm() {
           <input name="isrc" className={input} placeholder="USRC17607839" />
         </label>
         <label className={`${label} sm:col-span-2`}>
+          Link de pre-save (opcional)
+          <input
+            name="presaveUrl"
+            type="url"
+            className={input}
+            placeholder="https://hypeddit.com/…"
+          />
+        </label>
+        <label className={`${label} sm:col-span-2`}>
           Tu email
           <input name="contactEmail" type="email" required className={input} />
         </label>
       </div>
       <p className="text-xs text-white/50 -mt-3">
         Con el UPC (te lo da tu distribuidora), los botones de Spotify, Apple
-        Music, etc. aparecen solos el día del lanzamiento.
+        Music, etc. aparecen solos el día del lanzamiento. Si tienes link de
+        pre-save (Hypeddit, HyperFollow, ONErpm…), tu página lo muestra como
+        botón hasta ese día.
       </p>
 
       <fieldset className="flex flex-col gap-3">
@@ -319,7 +333,7 @@ export default function UploadForm() {
             type="file"
             accept="image/jpeg,image/png,image/webp"
             onChange={onCover}
-            className="text-sm"
+            className={fileInput}
           />
         </div>
         {cover && (
@@ -342,7 +356,7 @@ export default function UploadForm() {
           type="file"
           accept="audio/*,.wav,.aif,.aiff,.flac,.mp3"
           onChange={onAudio}
-          className="text-sm"
+          className={fileInput}
         />
         <p className="text-xs text-white/50">
           Tu canción no se sube completa: aquí mismo cortamos solo el adelanto

@@ -97,6 +97,20 @@ export default async function ReleasePage(props: Props) {
 
         <PreviewPlayer src={release.clipUrl} />
 
+        {release.presaveUrl && !isLive && (
+          <a
+            href={release.presaveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex flex-col items-center justify-center text-center h-16 rounded-xl bg-[var(--accent)] text-[var(--bg)] font-bold px-4 hover:opacity-90 transition-opacity"
+          >
+            Pre-guardar
+            <span className="text-[10px] font-normal uppercase tracking-widest mt-0.5 opacity-80">
+              Guárdala antes de que salga
+            </span>
+          </a>
+        )}
+
         <div className="flex flex-col items-center gap-2 w-full">
           <p className="text-[11px] uppercase tracking-widest opacity-50">
             Escucha en

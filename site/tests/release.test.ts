@@ -39,6 +39,24 @@ describe("submissionSchema", () => {
     ).toBe(false);
   });
 
+  it("accepts an optional https pre-save link", () => {
+    expect(submissionSchema.parse(valid).presaveUrl).toBeUndefined();
+    expect(
+      submissionSchema.parse({ ...valid, presaveUrl: "" }).presaveUrl,
+    ).toBeUndefined();
+    expect(
+      submissionSchema.parse({
+        ...valid,
+        presaveUrl: "https://hypeddit.com/g1c32a",
+      }).presaveUrl,
+    ).toBe("https://hypeddit.com/g1c32a");
+    for (const bad of ["http://hypeddit.com/x", "javascript:alert(1)"]) {
+      expect(
+        submissionSchema.safeParse({ ...valid, presaveUrl: bad }).success,
+      ).toBe(false);
+    }
+  });
+
   it("normalizes ISRC to upper case", () => {
     expect(
       submissionSchema.parse({ ...valid, isrc: "usrc17607839" }).isrc,

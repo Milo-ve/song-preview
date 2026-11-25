@@ -109,7 +109,8 @@ async function ReleaseCard({ r }: { r: Release }) {
 
       <details className="text-xs">
         <summary className="cursor-pointer text-white/70">
-          UPC y links ({links.filter((l) => l.url).length} encontrados)
+          UPC, pre-save y links ({links.filter((l) => l.url).length} encontrados
+          {r.presaveUrl ? " · pre-save ✓" : ""})
         </summary>
         <form action={updateLinks} className="mt-3 grid gap-2">
           <Hidden r={r} />
@@ -120,6 +121,16 @@ async function ReleaseCard({ r }: { r: Release }) {
               defaultValue={r.upc ?? ""}
               className={field}
               placeholder="12–13 dígitos"
+            />
+          </label>
+          <label className="grid gap-1">
+            Link de pre-save (se muestra hasta que salga)
+            <input
+              name="presaveUrl"
+              type="url"
+              defaultValue={r.presaveUrl ?? ""}
+              className={field}
+              placeholder="https://hypeddit.com/…"
             />
           </label>
           {PLATFORMS.map((p) => {

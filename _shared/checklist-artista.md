@@ -12,4 +12,5 @@ La fuente de verdad de los campos y sus límites es el schema en `site/lib/relea
 | Distribuidora        | no               | DistroKid, ONErpm, CD Baby, TuneCore, Symphonic…                                               |
 | UPC                  | no (recomendado) | 12–13 dígitos. Es el que hace que los links aparezcan solos                                    |
 | ISRC                 | no               |                                                                                                |
+| Link de pre-save     | no               | https (Hypeddit, HyperFollow, ONErpm, Feature.fm…). Es el botón principal hasta que sale       |
 | Email de contacto    | sí               | para avisarle cuando la página esté publicada                                                  |

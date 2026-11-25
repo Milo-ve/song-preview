@@ -41,6 +41,9 @@ export const isrcSchema = z
   .toUpperCase()
   .regex(/^[A-Z]{2}[A-Z0-9]{3}\d{7}$/, "ISRC inválido (ej. USRC17607839)");
 
+/** Pre-save link from the distributor or a service (Hypeddit, HyperFollow, Feature.fm…). */
+export const presaveUrlSchema = httpsUrl;
+
 const optional = <T extends z.ZodTypeAny>(schema: T) =>
   z.preprocess(
     (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
@@ -61,6 +64,8 @@ export const submissionSchema = z.object({
   distributor: optional(z.string().trim().max(60)),
   upc: optional(upcSchema),
   isrc: optional(isrcSchema),
+  /** Shown as the main button until the release goes live. */
+  presaveUrl: optional(presaveUrlSchema),
   contactEmail: z.string().trim().email("Email inválido"),
   coverUrl: httpsUrl,
   ogUrl: httpsUrl,

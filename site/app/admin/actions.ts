@@ -9,6 +9,7 @@ import { LINKS_TAG, resolveLinks } from "@/lib/links";
 import { PLATFORMS } from "@/lib/platforms";
 import {
   linkOverridesSchema,
+  presaveUrlSchema,
   releasePath,
   upcSchema,
   type Release,
@@ -40,11 +41,15 @@ export async function setStatus(formData: FormData) {
   await persist({ ...release, status: next });
 }
 
-/** Saves UPC + manual link overrides. Blank fields clear the value. */
+/** Saves UPC, pre-save link and manual link overrides. Blank fields clear the value. */
 export async function updateLinks(formData: FormData) {
   const release = await load(formData);
   const rawUpc = String(formData.get("upc") ?? "").trim();
   const upc = rawUpc ? upcSchema.parse(rawUpc) : undefined;
+  const rawPresave = String(formData.get("presaveUrl") ?? "").trim();
+  const presaveUrl = rawPresave
+    ? presaveUrlSchema.parse(rawPresave)
+    : undefined;
   const overrides = Object.fromEntries(
     PLATFORMS.map((p) => [
       p.id,
@@ -54,6 +59,7 @@ export async function updateLinks(formData: FormData) {
   await persist({
     ...release,
     upc,
+    presaveUrl,
     linkOverrides: linkOverridesSchema.parse(overrides),
   });
 }
