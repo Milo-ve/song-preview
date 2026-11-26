@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  cleanPlatformUrl,
   linkOverridesSchema,
   platformUrlsFromForm,
   releaseSchema,
@@ -138,5 +139,28 @@ describe("platformUrlsFromForm", () => {
       appleMusic: "https://music.apple.com/mx/artist/x/1",
       youtubeMusic: "javascript:alert(1)",
     });
+  });
+});
+
+describe("cleanPlatformUrl", () => {
+  it("drops Spotify's locale segment and share tracking", () => {
+    expect(
+      cleanPlatformUrl(
+        "https://open.spotify.com/intl-es/artist/1lahx8B5kdxIGuRhxsSw5U?si=8A6hJMgvStySUxEW3fUbiQ",
+      ),
+    ).toBe("https://open.spotify.com/artist/1lahx8B5kdxIGuRhxsSw5U");
+  });
+
+  it("keeps meaningful params and only strips tracking ones", () => {
+    expect(
+      cleanPlatformUrl(
+        "music.youtube.com/channel/UC123?feature=share&utm_source=ig",
+      ),
+    ).toBe("https://music.youtube.com/channel/UC123?feature=share");
+  });
+
+  it("leaves non-https input alone so validation rejects it", () => {
+    expect(cleanPlatformUrl("javascript:alert(1)")).toBe("javascript:alert(1)");
+    expect(cleanPlatformUrl("http://x.com/a?si=1")).toBe("http://x.com/a?si=1");
   });
 });

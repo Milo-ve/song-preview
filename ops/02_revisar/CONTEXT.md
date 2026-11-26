@@ -14,7 +14,7 @@ No cargues: `site/` (código), `01_invitar/`, otros releases.
 
 1. Abre la vista previa. Escucha el clip completo y mira la página en celular.
 2. Repasa `criterios-aprobacion.md` punto por punto.
-3. Corrige en `/admin` lo que haga falta (UPC, links manuales) antes de aprobar.
+3. Corrige en `/admin` lo que haga falta (UPC, perfiles del artista, links manuales) antes de aprobar.
 4. Aprueba → status `approved`; la página queda pública en modo "Próximamente".
    Rechaza → status `rejected`, y escríbele al artista explicándole qué cambiar para que vuelva a subir.
 

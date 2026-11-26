@@ -14,7 +14,8 @@ No cargues: `site/`, otros releases, `02_revisar/`.
 
 1. Copia `mensaje-invitacion.md` y reemplaza `{nombre}`, `{url}` y `{codigo}`.
 2. Mándalo por WhatsApp o email.
-3. Si el artista no puede usar el formulario (por ejemplo, desde un celular viejo), pídele los archivos y súbelos tú mismo en `/subir` con sus datos.
+3. Si el artista te escribe antes de subir, recuérdale lo que más cuesta conseguir a última hora: el link de su perfil de Spotify (para los botones "Seguir") y el UPC (para que los links aparezcan solos).
+4. Si el artista no puede usar el formulario (por ejemplo, desde un celular viejo), pídele los archivos y súbelos tú mismo en `/subir` con sus datos.
 
 ## Outputs
 

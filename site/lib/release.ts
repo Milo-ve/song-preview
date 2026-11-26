@@ -67,9 +67,30 @@ export const artistProfilesSchema = platformUrlsSchema;
 export type ArtistProfiles = z.infer<typeof artistProfilesSchema>;
 
 /**
- * Reads `<prefix><platformId>` fields from a form. Blank fields are dropped and
- * a missing scheme becomes https:// (people paste "open.spotify.com/…").
+ * Cleans a pasted platform link: adds a missing https://, drops share-tracking
+ * params (`si`, `utm_*`) and Spotify's locale segment (`/intl-es/`).
+ * Anything that isn't a URL is returned as-is so the schema can reject it.
  */
+export function cleanPlatformUrl(raw: string): string {
+  const v = raw.trim();
+  const withScheme = /^[a-z][a-z0-9+.-]*:/i.test(v) ? v : `https://${v}`;
+  let url: URL;
+  try {
+    url = new URL(withScheme);
+  } catch {
+    return withScheme;
+  }
+  if (url.protocol !== "https:") return withScheme;
+  for (const key of [...url.searchParams.keys()]) {
+    if (key === "si" || key.startsWith("utm_")) url.searchParams.delete(key);
+  }
+  if (url.hostname === "open.spotify.com") {
+    url.pathname = url.pathname.replace(/^\/intl-[a-z-]+(?=\/)/i, "");
+  }
+  return url.toString();
+}
+
+/** Reads `<prefix><platformId>` fields from a form, cleaned; blank fields are dropped. */
 export function platformUrlsFromForm(
   form: FormData,
   prefix: string,
@@ -77,7 +98,7 @@ export function platformUrlsFromForm(
   const out: Record<string, string> = {};
   for (const id of PLATFORM_IDS) {
     const v = String(form.get(`${prefix}${id}`) ?? "").trim();
-    if (v) out[id] = /^[a-z][a-z0-9+.-]*:/i.test(v) ? v : `https://${v}`;
+    if (v) out[id] = cleanPlatformUrl(v);
   }
   return out;
 }

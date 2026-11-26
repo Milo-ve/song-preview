@@ -152,6 +152,11 @@ export default function UploadForm() {
     if (!audio) return setError("Falta el audio.");
     const form = new FormData(e.currentTarget);
     const get = (k: string) => String(form.get(k) ?? "").trim();
+    const artistProfiles = platformUrlsFromForm(form, "profile_");
+    if (!Object.keys(artistProfiles).length && !form.get("noProfiles"))
+      return setError(
+        "Agrega al menos el link de tu perfil de Spotify (o marca que es tu primer lanzamiento).",
+      );
     const code = get("code");
     const title = get("title");
     const artist = get("artist");
@@ -199,7 +204,7 @@ export default function UploadForm() {
         distributor: get("distributor"),
         upc: get("upc"),
         isrc: get("isrc"),
-        artistProfiles: platformUrlsFromForm(form, "profile_"),
+        artistProfiles,
         contactEmail: get("contactEmail"),
         clipUrl: clipBlob.url,
         coverUrl: coverBlob.url,
@@ -311,9 +316,13 @@ export default function UploadForm() {
       </p>
 
       <fieldset className="flex flex-col gap-3">
-        <legend className={`${label} mb-3`}>
-          Tus perfiles de artista (opcional)
-        </legend>
+        <legend className={`${label} mb-3`}>Tus perfiles de artista</legend>
+        <p className="text-xs text-white/50 -mt-1">
+          Antes del lanzamiento, los botones de tu página dicen
+          &quot;Seguir&quot; y llevan a tu perfil, para que la gente te siga y
+          le llegue tu canción el día que sale. Ese día cambian solos a la
+          canción. Pon al menos uno (Spotify es el más importante).
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {PROFILE_PLATFORMS.map((p) => (
             <label key={p.id} className={label}>
@@ -329,10 +338,13 @@ export default function UploadForm() {
           ))}
         </div>
         <p className="text-xs text-white/50">
-          Antes del lanzamiento, cada botón lleva a tu perfil para que la gente
-          te siga y le llegue tu canción el día que sale. Ese día cambian solos
-          a la canción.
+          ¿Cómo copio el link? En la app, abre tu perfil de artista →
+          Compartir → Copiar link. Pégalo tal cual.
         </p>
+        <label className="flex items-center gap-2 text-xs text-white/70">
+          <input type="checkbox" name="noProfiles" />
+          Es mi primer lanzamiento y todavía no tengo perfil en plataformas
+        </label>
       </fieldset>
 
       <fieldset className="flex flex-col gap-3">
