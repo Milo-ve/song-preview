@@ -31,6 +31,16 @@ export const PLATFORMS = [
 
 export type PlatformId = (typeof PLATFORMS)[number]["id"];
 
+/** Platforms that always get a tile on the page, so they can carry the artist's profile ("Seguir") before release. */
+export const PROFILE_PLATFORMS = PLATFORMS.filter((p) => p.primary);
+
+export const PROFILE_PLACEHOLDER: Partial<Record<PlatformId, string>> = {
+  spotify: "https://open.spotify.com/artist/…",
+  appleMusic: "https://music.apple.com/mx/artist/…",
+  youtubeMusic: "https://music.youtube.com/channel/…",
+  deezer: "https://www.deezer.com/artist/…",
+};
+
 export const PLATFORM_IDS = PLATFORMS.map((p) => p.id) as [
   PlatformId,
   ...PlatformId[],

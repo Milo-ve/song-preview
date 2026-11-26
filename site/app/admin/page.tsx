@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/admin-guard";
 import { resolveLinks } from "@/lib/links";
-import { PLATFORMS } from "@/lib/platforms";
+import {
+  PLATFORMS,
+  PROFILE_PLACEHOLDER,
+  PROFILE_PLATFORMS,
+} from "@/lib/platforms";
 import {
   releasePath,
   RELEASE_STATUSES,
@@ -109,8 +113,8 @@ async function ReleaseCard({ r }: { r: Release }) {
 
       <details className="text-xs">
         <summary className="cursor-pointer text-white/70">
-          UPC, pre-save y links ({links.filter((l) => l.url).length} encontrados
-          {r.presaveUrl ? " · pre-save ✓" : ""})
+          UPC, perfiles y links ({links.filter((l) => l.url).length} links ·{" "}
+          {Object.keys(r.artistProfiles).length} perfiles)
         </summary>
         <form action={updateLinks} className="mt-3 grid gap-2">
           <Hidden r={r} />
@@ -123,8 +127,25 @@ async function ReleaseCard({ r }: { r: Release }) {
               placeholder="12–13 dígitos"
             />
           </label>
-          <label className="grid gap-1">
-            Link de pre-save (se muestra hasta que salga)
+          <fieldset className="grid gap-2 border-t border-white/10 pt-2">
+            <legend className="text-white/70">
+              Perfiles del artista: antes del lanzamiento el botón dice
+              &quot;Seguir&quot; y lleva aquí
+            </legend>
+            {PROFILE_PLATFORMS.map((p) => (
+              <label key={p.id} className="grid gap-1">
+                {p.name}
+                <input
+                  name={`profile_${p.id}`}
+                  defaultValue={r.artistProfiles[p.id] ?? ""}
+                  className={field}
+                  placeholder={PROFILE_PLACEHOLDER[p.id]}
+                />
+              </label>
+            ))}
+          </fieldset>
+          <label className="grid gap-1 border-t border-white/10 pt-2">
+            Link de pre-save (guardado, no se muestra en la página por ahora)
             <input
               name="presaveUrl"
               type="url"
@@ -133,6 +154,9 @@ async function ReleaseCard({ r }: { r: Release }) {
               placeholder="https://hypeddit.com/…"
             />
           </label>
+          <p className="border-t border-white/10 pt-2 text-white/70">
+            Links de la canción (manuales, ganan sobre los automáticos)
+          </p>
           {PLATFORMS.map((p) => {
             const auto = links.find((l) => l.id === p.id)?.url;
             return (

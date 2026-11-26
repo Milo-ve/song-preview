@@ -6,9 +6,10 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/admin-guard";
 import { ADMIN_COOKIE } from "@/lib/auth";
 import { LINKS_TAG, resolveLinks } from "@/lib/links";
-import { PLATFORMS } from "@/lib/platforms";
 import {
+  artistProfilesSchema,
   linkOverridesSchema,
+  platformUrlsFromForm,
   presaveUrlSchema,
   releasePath,
   upcSchema,
@@ -41,7 +42,7 @@ export async function setStatus(formData: FormData) {
   await persist({ ...release, status: next });
 }
 
-/** Saves UPC, pre-save link and manual link overrides. Blank fields clear the value. */
+/** Saves UPC, artist profiles, pre-save link and manual link overrides. Blank fields clear the value. */
 export async function updateLinks(formData: FormData) {
   const release = await load(formData);
   const rawUpc = String(formData.get("upc") ?? "").trim();
@@ -50,17 +51,16 @@ export async function updateLinks(formData: FormData) {
   const presaveUrl = rawPresave
     ? presaveUrlSchema.parse(rawPresave)
     : undefined;
-  const overrides = Object.fromEntries(
-    PLATFORMS.map((p) => [
-      p.id,
-      String(formData.get(`link_${p.id}`) ?? "").trim(),
-    ]).filter(([, v]) => v),
-  );
   await persist({
     ...release,
     upc,
     presaveUrl,
-    linkOverrides: linkOverridesSchema.parse(overrides),
+    artistProfiles: artistProfilesSchema.parse(
+      platformUrlsFromForm(formData, "profile_"),
+    ),
+    linkOverrides: linkOverridesSchema.parse(
+      platformUrlsFromForm(formData, "link_"),
+    ),
   });
 }
 

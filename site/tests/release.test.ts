@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { linkOverridesSchema, submissionSchema } from "@/lib/release";
+import {
+  linkOverridesSchema,
+  platformUrlsFromForm,
+  releaseSchema,
+  submissionSchema,
+} from "@/lib/release";
 import { isSlug, slugify } from "@/lib/slug";
 
 const valid = {
@@ -85,5 +90,53 @@ describe("slugify", () => {
     expect(slugify("  Niño & Niña!! ")).toBe("nino-y-nina");
     expect(slugify("¿¡")).toBe("");
     expect(isSlug(slugify("Ñandú 2000"))).toBe(true);
+  });
+});
+
+describe("artistProfiles", () => {
+  it("defaults to {} so releases saved before the field still parse", () => {
+    expect(submissionSchema.parse(valid).artistProfiles).toEqual({});
+    const stored = {
+      ...valid,
+      artistSlug: "oye-milo",
+      songSlug: "tal-vez-un-te",
+      status: "approved",
+      previewKey: "x".repeat(24),
+      createdAt: "2026-01-01T00:00:00Z",
+      updatedAt: "2026-01-01T00:00:00Z",
+    };
+    expect(releaseSchema.parse(stored).artistProfiles).toEqual({});
+  });
+
+  it("accepts https profiles on known platforms only", () => {
+    const ok = submissionSchema.safeParse({
+      ...valid,
+      artistProfiles: { spotify: "https://open.spotify.com/artist/abc" },
+    });
+    expect(ok.success).toBe(true);
+    for (const artistProfiles of [
+      { spotify: "javascript:alert(1)" },
+      { myspace: "https://myspace.com/x" },
+    ]) {
+      expect(
+        submissionSchema.safeParse({ ...valid, artistProfiles }).success,
+      ).toBe(false);
+    }
+  });
+});
+
+describe("platformUrlsFromForm", () => {
+  it("drops blanks, adds a missing https:// and keeps other schemes for validation", () => {
+    const form = new FormData();
+    form.set("profile_spotify", "  open.spotify.com/artist/abc ");
+    form.set("profile_deezer", "");
+    form.set("profile_appleMusic", "https://music.apple.com/mx/artist/x/1");
+    form.set("profile_youtubeMusic", "javascript:alert(1)");
+    form.set("link_spotify", "https://open.spotify.com/track/t");
+    expect(platformUrlsFromForm(form, "profile_")).toEqual({
+      spotify: "https://open.spotify.com/artist/abc",
+      appleMusic: "https://music.apple.com/mx/artist/x/1",
+      youtubeMusic: "javascript:alert(1)",
+    });
   });
 });

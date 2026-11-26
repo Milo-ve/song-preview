@@ -9,12 +9,12 @@ La unidad de trabajo es un **release**: una canción de un artista. Cada release
 
 ## Estados
 
-| status     | Significa                                     | Página pública                       | Quién lo mueve                              |
-| ---------- | --------------------------------------------- | ------------------------------------ | ------------------------------------------- |
-| `pending`  | el artista ya subió y falta revisar           | 404 (solo vista previa con `?k=`)    | el formulario `/subir`                      |
-| `approved` | aprobado y en línea en modo "Próximamente"    | visible, sin links (pre-save si hay) | operador en `/admin`                        |
-| `live`     | ya se encontró al menos un link de plataforma | visible, con links                   | automático (búsqueda por UPC) o el operador |
-| `rejected` | no se publica                                 | 404                                  | operador en `/admin`                        |
+| status     | Significa                                     | Página pública                                  | Quién lo mueve                              |
+| ---------- | --------------------------------------------- | ----------------------------------------------- | ------------------------------------------- |
+| `pending`  | el artista ya subió y falta revisar           | 404 (solo vista previa con `?k=`)               | el formulario `/subir`                      |
+| `approved` | aprobado y en línea en modo "Próximamente"    | visible; botones "Seguir" al perfil del artista | operador en `/admin`                        |
+| `live`     | ya se encontró al menos un link de plataforma | visible, con links                              | automático (búsqueda por UPC) o el operador |
+| `rejected` | no se publica                                 | 404                                             | operador en `/admin`                        |
 
 ## Cómo aparecen los links solos
 

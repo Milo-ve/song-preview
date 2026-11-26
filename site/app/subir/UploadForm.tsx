@@ -25,7 +25,12 @@ import {
   renderCover,
   renderOg,
 } from "@/lib/image";
-import { DEFAULT_THEME, type Theme } from "@/lib/release";
+import { PROFILE_PLACEHOLDER, PROFILE_PLATFORMS } from "@/lib/platforms";
+import {
+  DEFAULT_THEME,
+  platformUrlsFromForm,
+  type Theme,
+} from "@/lib/release";
 import { submitRelease } from "./actions";
 
 const BUCKETS = 120;
@@ -194,7 +199,7 @@ export default function UploadForm() {
         distributor: get("distributor"),
         upc: get("upc"),
         isrc: get("isrc"),
-        presaveUrl: get("presaveUrl"),
+        artistProfiles: platformUrlsFromForm(form, "profile_"),
         contactEmail: get("contactEmail"),
         clipUrl: clipBlob.url,
         coverUrl: coverBlob.url,
@@ -296,25 +301,39 @@ export default function UploadForm() {
           <input name="isrc" className={input} placeholder="USRC17607839" />
         </label>
         <label className={`${label} sm:col-span-2`}>
-          Link de pre-save (opcional)
-          <input
-            name="presaveUrl"
-            type="url"
-            className={input}
-            placeholder="https://hypeddit.com/…"
-          />
-        </label>
-        <label className={`${label} sm:col-span-2`}>
           Tu email
           <input name="contactEmail" type="email" required className={input} />
         </label>
       </div>
       <p className="text-xs text-white/50 -mt-3">
         Con el UPC (te lo da tu distribuidora), los botones de Spotify, Apple
-        Music, etc. aparecen solos el día del lanzamiento. Si tienes link de
-        pre-save (Hypeddit, HyperFollow, ONErpm…), tu página lo muestra como
-        botón hasta ese día.
+        Music, etc. aparecen solos el día del lanzamiento.
       </p>
+
+      <fieldset className="flex flex-col gap-3">
+        <legend className={`${label} mb-3`}>
+          Tus perfiles de artista (opcional)
+        </legend>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {PROFILE_PLATFORMS.map((p) => (
+            <label key={p.id} className={label}>
+              {p.name}
+              <input
+                name={`profile_${p.id}`}
+                inputMode="url"
+                autoComplete="off"
+                className={input}
+                placeholder={PROFILE_PLACEHOLDER[p.id]}
+              />
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-white/50">
+          Antes del lanzamiento, cada botón lleva a tu perfil para que la gente
+          te siga y le llegue tu canción el día que sale. Ese día cambian solos
+          a la canción.
+        </p>
+      </fieldset>
 
       <fieldset className="flex flex-col gap-3">
         <legend className={label}>
